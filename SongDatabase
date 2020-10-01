@@ -1,0 +1,251 @@
+from tkinter import *
+import sqlite3
+import tkinter.font
+
+
+root = Tk()
+root.geometry("930x400")
+root.title("Song Database")
+root.config(bg = "cadet blue")
+
+
+############################################Database##################################################
+conn = sqlite3.connect('Limelight.db')
+c = conn.cursor()
+c.execute("""CREATE TABLE IF NOT EXISTS songy (
+            songname VARCHAR,\
+            BPM integer, \
+            BPM2 integer
+)""")
+
+
+conn.commit()
+
+
+
+############################################Labels and Frames##################################################
+
+leftframe = Frame(root, width = 500, highlightbackground= 'black', highlightthickness=1, bg = "Ghost White")
+leftframe.grid(row = 0, column =0, padx=0, pady=0, ipadx=0, ipady=0)
+
+label1 = Label(leftframe, font=("arial", 35, "bold"), text="Song Name:", padx=1, pady=0, bg="Ghost White")
+label1.pack()
+##########################Add BETTER BPM AND BP2 LABELS####################
+labely = Label(leftframe, font=("arial", 35, "bold"), text="BPM:", padx=2, pady=2, bg="Ghost White")
+labely.pack()
+
+labelhey = Label(leftframe, font=("arial", 35, "bold"), text="BPM2:", padx=2, pady=2, bg="Ghost White")
+labelhey.pack()
+
+
+rightframe = Frame(root,  width = 10, highlightbackground= 'black', highlightthickness=3, bg = "cadet blue")
+rightframe.grid(row = 0, column =1, padx = 0, pady =0, ipadx=0, ipady=0)
+
+entry_1 = Entry(rightframe, width = 20, font=("arial", 35, "bold"))
+entry_1.grid(row = 0, column = 0, ipadx = 0, ipady =0)
+
+#entry_2label = Label(rightframe, font = ("arial", 10, "bold"), text = "BPM: ", padx=2, pady=2, bg = "Ghost White")
+#entry_2label.grid(row = 1, column = 0, ipadx = 2, ipady = 2)
+entry_2 = Entry(rightframe, width = 20, font=("arial", 35, "bold"))
+entry_2.grid(row = 1, column = 0)
+
+entry_3 = Entry(rightframe, width = 20, font=("arial", 35, "bold"))
+entry_3.grid(row = 2, column = 0)
+
+leftdownframe = Frame(root, width = 100,  highlightbackground= 'Ghost White', highlightthickness=3, bg = "Ghost White")
+leftdownframe.grid(row = 1, column= 0, padx=1, pady=0, ipadx=0, ipady=0)
+
+#label2 = Label (leftdownframe, font=("arial", 10, "bold"), text="Buttons:", padx=2, pady=2, bg="Ghost White")
+#label2.grid(row = 0, column =0,padx = 0, pady =0, ipadx=10, ipady=10)
+
+rightframedown = Frame(root,  width = 100, highlightbackground= 'cadet blue', highlightthickness=3, bg = "Ghost White")
+rightframedown.grid(row = 1, column =1, padx = 0, pady =0, ipadx=0, ipady=0)
+
+label3 = Label(rightframedown, width = 20, text = "Song List", font=("arial", 15, "bold"))
+label3.grid(row = 0, column = 0)
+
+#add scrollbar
+scrollbar = Scrollbar(rightframedown, orient = VERTICAL)
+
+##add listbox
+listbox = Listbox(rightframedown, selectmode = MULTIPLE, yscrollcommand = scrollbar.set,font =('arial', '10', 'bold'), height = 10, width = 72)
+listbox.grid(row = 1, column = 0)
+
+
+#config scrollbar
+scrollbar.config(command = listbox.yview)
+scrollbar.grid(row = 1, column = 1)
+
+#####################################Functions#############################################
+
+
+def save():
+    pass
+
+
+def addbtn():
+        song = entry_1.get()
+        BPMM = entry_2.get()
+        BPMM2 = entry_3.get()
+        All = song, "BPM:" + " " + BPMM, "BPM2:" + " " + BPMM2
+
+        conn = sqlite3.connect('Limelight.db')
+        c = conn.cursor()
+        c.execute("INSERT INTO songy (songname, BPM, BPM2) VALUES (?, ?, ?)", (song, BPMM, BPMM2,))
+
+        listbox.insert(0, All)
+        conn.commit()
+        conn.close()
+
+def update():
+    conn = sqlite3.connect('Limelight.db')
+    c = conn.cursor()
+    record_id = entry_4_edit.get()
+
+    c.execute("""UPDATE songy SET
+        songname = :songname,
+        BPM = :BPM,
+        BPM2 = :BPM2
+        WHERE oid = :oid""",
+              {
+       'songname': entry_1_edit.get(),
+        'BPM': entry_2_edit_label.get(),
+        'BPM2': entry_3_editlabel.get(),
+        'oid': record_id
+       })
+
+    conn.commit()
+    conn.close()
+#def addbtn():
+#    conn = sqlite3.connect('Limelight.db')
+#    c = conn.cursor()
+#    c.execute("INSERT INTO songy VALUES (:songname)",
+ #             {
+ ##                 'songname': entry_1.get()
+ #             }
+#              )
+
+#    listbox.insert(0, entry_1.get())
+#    conn.commit()
+#    conn.close()
+
+
+#def query():
+#    conn = sqlite3.connect('song.db')
+#    c = conn.cursor()
+#    c.execute("SELECT *, oid FROM songs")
+#    records = c.fetchall()
+#    listbox.insert(END, records)
+
+#    conn.commit()
+ #   conn.close()
+
+
+def edit():
+    editor = Tk()
+    editor.title("UpdateSongData")
+    editor.geometry('400x200')
+    editor.config(bg="cadet blue")
+    global entry_1_edit
+    global entry_2_edit_label
+    global entry_3_editlabel
+
+    label1 = Label(editor, font=("arial", 20, "bold"), text="SongName:", padx=2, pady=2, bg="GhostWhite")
+    label1.pack()
+    entry_1_edit = Entry(editor, width=50, font=("arial", 15, "bold"))
+    entry_1_edit.pack()
+
+    entry_2_editlabel = Label(editor, font=("arial", 10, "bold"), text="BPM:", padx=2, pady=2, bg="GhostWhite")
+    entry_2_editlabel.pack()
+    entry_2_edit_label = Entry(editor)
+    entry_2_edit_label.pack()
+
+    entry_3_editlabel = Label(editor, font=("arial", 10, "bold"), text="BPM2:", padx=2, pady=2, bg="GhostWhite")
+    entry_3_editlabel.pack()
+
+    entry_3_editlabel = Entry(editor)
+    entry_3_editlabel.pack()
+
+    savebutton = Button(editor, text="Save Edited Record", command = update)
+    savebutton.pack(pady = 10)
+
+    conn = sqlite3.connect('Limelight.db')
+    c = conn.cursor()
+    record_id = entry_4_edit.get()
+    c.execute("SELECT * FROM songy WHERE oid = " + record_id)
+    records = c.fetchall()
+    conn.commit()
+
+    for record in records:
+        entry_1_edit.insert(0, record[0])
+        entry_2_edit_label.insert(0, record[1])
+        entry_3_editlabel.insert(0, record[2])
+
+
+
+def query():
+    global editor
+
+    song = entry_1.get()
+    BPMM = entry_2.get()
+    BPMM2 = entry_3.get()
+    All = song, "BPM:" + " " + BPMM, "BPM2:" + " " + BPMM2
+    #c.execute("SELECT * FROM songs")
+    #result = c.fetchall()
+    #for x in result:
+       # print(x)
+    listbox.delete(0, END)
+    conn = sqlite3.connect('Limelight.db')
+    c = conn.cursor()
+    c.execute("SELECT *, oid FROM songy")
+
+    #records = c.fetchall()
+    #for x in len[records]:
+        #listbox.insert(x)
+    for row in c.fetchall():
+        listbox.insert(END, row)
+
+
+   #correct records = c.fetchall()
+   #correct listbox.insert(END, records)
+    conn.commit()
+    conn.close()
+    #editor.destroy()
+
+
+
+
+def delete():
+    conn = sqlite3.connect('Limelight.db')
+    c = conn.cursor()
+    c.execute("DELETE from songy WHERE oid = " + entry_4_edit.get())
+    entry_4_edit.delete(0, END)
+    listbox.delete(0, END)
+
+    for row in c.fetchall():
+        listbox.insert(0, row)
+    conn.commit()
+    conn.close()
+
+
+#####################################Buttons#############################################
+
+addbutton = Button(leftdownframe, text = "Add song", command = addbtn)
+addbutton.grid(row = 1, column = 0)
+
+query_btn = Button(leftdownframe, text = "Show Songs", command = query)
+query_btn.grid(row = 2, column = 0)
+
+updatebutton = Button(leftdownframe, text = "Update Song", command = edit)
+updatebutton.grid(row = 3, column =0)
+
+label4 = Label(leftdownframe, font=("arial", 20, "bold"), text="Song Id #:", padx=2, pady=2, bg="Ghost White")
+label4.grid(row = 4, column =0)
+entry_4_edit = Entry(leftdownframe, width=10, font=("arial", 15, "bold"))
+entry_4_edit.grid(row = 4, column = 1, columnspan = 5)
+
+deletebutton = Button(leftdownframe, text = "Delete Song", command = delete)
+deletebutton.grid(row=6, column=2)
+
+conn.close()
+root.mainloop()
